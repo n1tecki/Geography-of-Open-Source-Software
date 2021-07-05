@@ -50,7 +50,7 @@ er_403 = 0
 er_400 = 0
 er_twitter = 0
 
-logging.basicConfig(log_dir, filemode='a', 
+logging.basicConfig(filename=log_dir, filemode='a', 
                     format='%(asctime)s [%(levelname)s] - %(message)s', 
                     datefmt='%d-%m-%y %H:%M:%S', level=logging.INFO)
 # ---------------------------------------------
