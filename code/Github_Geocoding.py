@@ -2,12 +2,14 @@
 import urllib.request
 import json
 import requests
-import sys
 import logging
 import time
 import datetime
 import os.path
 import csv
+import sys
+sys.path.append('Resources')
+import caching
 # ---------------------------------------------
 
 
@@ -88,43 +90,6 @@ def switch(bingMapsKey):
         
     logging.info("Switching token to: " + str(bingMapsKey))
     return(bingMapsKey)
-# ---------------------------------------------
-
-
-
-# ----------- CACHING AND EXPORTING -----------
-def cache(cache_data, directory, type):
-
-    if type == 'json':
-        # Updating exported file with newly cached data
-        if os.path.exists(directory) == True:
-            with open(directory, 'r+') as outfile:
-                cache = json.load(outfile)
-                cache.update(cache_data) # append new data to existing file
-                outfile.seek(0) 
-                json.dump(cache, outfile)
-            logging.info("%s file updated ..." % directory)
-            
-        # Creating export file if one doesn't exist yet
-        else:
-            with open(directory, 'w') as outfile:
-                json.dump(cache_data, outfile)
-            logging.info("retrieved data exported to %s..." % directory)
-
-    if type == 'csv':
-        # Updating exported file with newly cached data
-        if os.path.exists(directory) == True:
-            with open(directory, 'a') as outfile:
-                for i in cache_data:
-                    outfile.write(i + '\n')
-            logging.info("%s file updated ..." % directory)
-            
-        # Creating export file if one doesn't exist yet
-        else:
-            with open(directory, 'w') as outfile:
-                for i in cache_data:
-                    outfile.write(i + '\n')
-            logging.info("retrieved data exported to %s..." % directory)
 # ---------------------------------------------
 
 
@@ -267,8 +232,8 @@ try:
                 processed += 1
                 if processed % 100 == 0:
                     # Saving new gained info every 100 users
-                    cache(export_geoloc, export_dir, json)
-                    cache(not_found, export_dir_missing, csv)
+                    caching.cache(export_geoloc, export_dir, json)
+                    caching.cache(not_found, export_dir_missing, csv)
                     not_found = [] 
                     export_geoloc = {}
 
@@ -279,8 +244,8 @@ try:
                 logging.info("Last processed user: " + str(processed))        
         
             
-    cache(export_geoloc, export_dir, json)
-    cache(not_found, export_dir_missing, csv)
+    caching.cache(export_geoloc, export_dir, json)
+    caching.cache(not_found, export_dir_missing, csv)
     not_found = [] 
     export_geoloc = {}
 
