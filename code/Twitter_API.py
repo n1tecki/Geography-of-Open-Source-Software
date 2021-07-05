@@ -59,7 +59,7 @@ logging.basicConfig(filename=log_dir, filemode='a',
 
 # ----------- AUTHENTIFIKATION INFO -----------
 # Stack with not limited tokens reached
-with open(api_token, 'r', encoding='utf-8-sig') as tokens:
+with open(api_tokens, 'r', encoding='utf-8-sig') as tokens:
     reader = csv.reader(tokens, delimiter = ',')
     # Stack with tokens that have not reached limit
     token_ready = list(reader)
