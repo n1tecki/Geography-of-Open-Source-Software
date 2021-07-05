@@ -17,7 +17,7 @@ import sys
 start_at = 0
 
 # Directory Input
-api_tokens = 
+api_tokens = 'tokens/github_tokens.csv'
 
 # Optional working with batches
 batch = TRUE    # If TRUE, batch number has to be specified according to file names
@@ -39,7 +39,7 @@ else:
 
 # ----------- AUTHENTIFIKATION INFO -----------
 # Reading externaly saved API tokens
-with open('/home/codeuser/code/tokens/github_tokens.csv', 'r', encoding='utf-8-sig') as tokens:
+with open(api_tokens, 'r', encoding='utf-8-sig') as tokens:
     reader = csv.reader(tokens, delimiter = ',')
     # Stack with tokens that have not reached limit
     token_ready = list(reader)
