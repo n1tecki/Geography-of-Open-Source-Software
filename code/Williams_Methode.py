@@ -125,20 +125,38 @@ def switch(auth):
 
 
 # ----------- CACHING AND EXPORTING -----------
-def cache(cache_data, directory):
-    # Updating exported file with newly cached data
-    if os.path.exists(directory) == True:
-        with open(directory, 'a') as outfile:
-            for i in cache_data:
-                outfile.write(i + '\n')
-        logging.info("%s file updated ..." % directory)
-        
-    # Creating export file if one doesn't exist yet
-    else:
-        with open(directory, 'w') as outfile:
-            for i in cache_data:
-                outfile.write(i + '\n')
-        logging.info("retrieved data exported to %s..." % directory)
+def cache(cache_data, directory, type):
+
+    if type == 'json':
+        # Updating exported file with newly cached data
+        if os.path.exists(directory) == True:
+            with open(directory, 'r+') as outfile:
+                cache = json.load(outfile)
+                cache.update(cache_data) # append new data to existing file
+                outfile.seek(0) 
+                json.dump(cache, outfile)
+            logging.info("%s file updated ..." % directory)
+            
+        # Creating export file if one doesn't exist yet
+        else:
+            with open(directory, 'w') as outfile:
+                json.dump(cache_data, outfile)
+            logging.info("retrieved data exported to %s..." % directory)
+
+    if type == 'csv':
+        # Updating exported file with newly cached data
+        if os.path.exists(directory) == True:
+            with open(directory, 'a') as outfile:
+                for i in cache_data:
+                    outfile.write(i + '\n')
+            logging.info("%s file updated ..." % directory)
+            
+        # Creating export file if one doesn't exist yet
+        else:
+            with open(directory, 'w') as outfile:
+                for i in cache_data:
+                    outfile.write(i + '\n')
+            logging.info("retrieved data exported to %s..." % directory)
 # ---------------------------------------------
 
 
@@ -235,8 +253,8 @@ try:
                 logging.info('... ' + str(processed) + '/' + str(len(data)-start_at) + ' users processed ...' + '(' + str(count) + ')')
                 logging.info(str(er_404_repo) + ', ' + str(er_other_repo) + ', ' + str(er_404_user) + ', ' 
                             + str(er_other_user) + ', ' + str(len(users_not_found)))   # Further information
-                cache(user_names, export_dir)
-                cache(users_not_found, export_dir_missing)
+                cache(user_names, export_dir, csv)
+                cache(users_not_found, export_dir_missing, csv)
                 user_names = []
                 users_not_found = []
 
@@ -247,8 +265,8 @@ try:
     logging.info(str(er_404_repo) + ', ' + str(er_other_repo) + ', ' + str(er_404_user) + ', ' 
                 + str(er_other_user) + ', ' + str(len(users_not_found)))   # Further information
     # Exporting remaining user data
-    cache(user_names, export_dir)
-    cache(users_not_found, export_dir_missing)
+    cache(user_names, export_dir, csv)
+    cache(users_not_found, export_dir_missing, csv)
     user_names = []
     users_not_found = []
             
