@@ -15,7 +15,7 @@ import csv
 start_at = 0
 
 # Directory Input
-api_tokens = 'code/tokens/github_tokens.csv'
+api_tokens = '/home/codeuser/code/tokens/twitter_tokens.csv'
 
 # Optional working with batches
 batch = TRUE    # If TRUE, batch number has to be specified according to file names
@@ -60,7 +60,7 @@ logging.basicConfig(log_dir, filemode='a',
 
 # ----------- AUTHENTIFIKATION INFO -----------
 # Stack with not limited tokens reached
-with open('/home/codeuser/code/tokens/twitter_tokens.csv', 'r', encoding='utf-8-sig') as tokens:
+with open(api_token, 'r', encoding='utf-8-sig') as tokens:
     reader = csv.reader(tokens, delimiter = ',')
     # Stack with tokens that have not reached limit
     token_ready = list(reader)
