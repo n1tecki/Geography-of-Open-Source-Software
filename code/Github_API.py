@@ -25,14 +25,14 @@ batch_nr = 1
 
 if batch:
     log_dir = 'LOG/batch%s_LOG_Github_API.log' % batch_nr
-    import_data = 'data/processed_data/batch%s_usernames.csv' % batch_nr
-    export = 'data/raw_data/batch%s_github_export.json' % batch_nr
-    export_missing = 'data/raw_data/batch%s_github_api_not_found.csv' % batch_nr
+    import_dir = 'data/processed_data/batch%s_usernames.csv' % batch_nr
+    export_dir = 'data/raw_data/batch%s_github_export.json' % batch_nr
+    export_dir_missing = 'data/raw_data/batch%s_github_api_not_found.csv' % batch_nr
 else:
     log_dir = 'LOG/LOG_Github_API.log'
-    import_data = 'data/processed_data/usernames.csv'
-    export = 'data/raw_data/github_export.json'
-    export_missing = 'data/raw_data/github_api_not_found.csv'
+    import_dir = 'data/processed_data/usernames.csv'
+    export_dir = 'data/raw_data/github_export.json'
+    export_dir_missing = 'data/raw_data/github_api_not_found.csv'
 ###############################################
 
 
@@ -151,7 +151,7 @@ def switch(auth, object1, url):
 
 # ------------ LOADING USER NAMES -------------
 # Reading usernames into a list
-with open(import_data, 'r', encoding='utf-8-sig') as csv_file:
+with open(import_dir, 'r', encoding='utf-8-sig') as csv_file:
     logging.info('Loading of external file ...')
     reader = csv.reader(csv_file, delimiter = ',')
     usernames = list(reader)
@@ -276,8 +276,8 @@ try:
                     #print(data_extracted)
                     logging.info('... ' + str(processed+start_at) + '/' + str(len(usernames)) + ' users processed ...' '(' + str(count) + ')')
                     # Saving new gained info every 100 users
-                    cache(data_extracted, export, 'json')
-                    cache(users_not_found, export_missing, 'csv')
+                    cache(data_extracted, export_dir, 'json')
+                    cache(users_not_found, export_dir_missing, 'csv')
                     data_extracted = {}
                     users_not_found = []
 
@@ -293,8 +293,8 @@ try:
 
     logging.info('... ' + str(processed+start_at) + '/' + str(len(usernames)) + ' users processed ...'  + '(' + str(count) + ')')
     # Exporting remaining user data
-    cache(data_extracted, '/home/codeuser/code/data/raw_data/batch%s_github_export.json' % batch_nr, 'json')
-    cache(users_not_found, '/home/codeuser/code/data/raw_data/batch%s_github_api_not_found.csv' % batch_nr, 'csv')
+    cache(data_extracted, export_dir, 'json')
+    cache(users_not_found, export_dir_missing, 'csv')
     data_extracted = {}
     users_not_found = []
 
