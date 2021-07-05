@@ -12,9 +12,34 @@ import csv
 
 
 
+############## INPUT VARIABLES ################
+# Optional input for partial processing
+start_at = 0
+
+# Directory Input
+api_tokens = 'tokens/bing_tokens.csv
+
+# Optional working with batches
+batch = TRUE    # If TRUE, batch number has to be specified according to file names
+batch_nr = 1
+
+if batch:
+    log_dir = 'LOGS/batch%s_LOG_Github_Geocode.log' % batch_nr
+    import_dir = 'data/raw_data/batch%s_twitter_export.json' % batch_nr
+    export_dir = 'data/raw_data/batch%s_github_geoloc_export.json' % batch_nr
+    export_missing_dir = 'data/raw_data/batch%s_github_geloc_not_found.csv' % batch_nr
+else:
+    log_dir = 'LOGS/batch%s_LOG_Github_Geocode.log' % batch_nr
+    import_dir = 'data/raw_data/twitter_export.json'
+    export_dir = 'data/raw_data/github_geoloc_export.json'
+    export_missing_dir = 'data/raw_data/github_geloc_not_found.csv'
+###############################################
+
+
+
 # ----------- AUTHENTIFIKATION INFO -----------
 # Stack with not limited tokens reached
-with open('/home/codeuser/code/tokens/bing_tokens.csv', 'r', encoding='utf-8-sig') as tokens:
+with open(api_tokens, 'r', encoding='utf-8-sig') as tokens:
     reader = csv.reader(tokens, delimiter = ',')
     # Stack with tokens that have not reached limit
     token_ready = list(reader)
@@ -28,9 +53,7 @@ bingMapsKey = token_ready.pop(0)[0]
 
 
 # ------------- GLOBAL VARIABLES --------------
-batch_nr = 0
 count = 0
-start_at = 0
 
 export_geoloc = {}
 not_found = []   # List of locations not found
@@ -45,12 +68,9 @@ er_400 = 0
 
 locations = {}
 
-logging.basicConfig(filename='/home/codeuser/code/LOGS/batch%s_LOG_Github_Geocode.log' % batch_nr, filemode='a', 
+logging.basicConfig(filename=logs_dir % batch_nr, filemode='a', 
                     format='%(asctime)s [%(levelname)s] - %(message)s', 
                     datefmt='%d-%m-%y %H:%M:%S', level=logging.INFO)
-
-export_directory = '/home/codeuser/code/data/raw_data/batch%s_github_geoloc_export.json' % batch_nr
-export_directory_2 = '/home/codeuser/code/data/raw_data/batch%s_github_geloc_not_found.csv' % batch_nr
 # ---------------------------------------------
 
 
@@ -73,43 +93,40 @@ def switch(bingMapsKey):
 
 
 # ----------- CACHING AND EXPORTING -----------
-def cache(export_geoloc, directory):
-    logging.info('... ' + str(processed) + '/' + str(len(export)-start_at) + ' users processed ...' + '(' + str(count) + ')')
-    
-    # Updating exported file with newly cached data
-    if os.path.exists(directory) == True:
-        with open(directory, 'r+') as outfile:
-            cache = json.load(outfile)
-            cache.update(export_geoloc) # append new data to existing file
-            outfile.seek(0) 
-            json.dump(cache, outfile)
-        logging.info("%s file updated ..." % directory)
-        
-    # Creating export file if one doesn't exist yet
-    else:
-        with open(directory, 'w') as outfile:
-            json.dump(export_geoloc, outfile)
-        logging.info("retrieved data exported to %s..." % directory)
+def cache(cache_data, directory, type):
+
+    if type == 'json':
+        # Updating exported file with newly cached data
+        if os.path.exists(directory) == True:
+            with open(directory, 'r+') as outfile:
+                cache = json.load(outfile)
+                cache.update(cache_data) # append new data to existing file
+                outfile.seek(0) 
+                json.dump(cache, outfile)
+            logging.info("%s file updated ..." % directory)
+            
+        # Creating export file if one doesn't exist yet
+        else:
+            with open(directory, 'w') as outfile:
+                json.dump(cache_data, outfile)
+            logging.info("retrieved data exported to %s..." % directory)
+
+    if type == 'csv':
+        # Updating exported file with newly cached data
+        if os.path.exists(directory) == True:
+            with open(directory, 'a') as outfile:
+                for i in cache_data:
+                    outfile.write(i + '\n')
+            logging.info("%s file updated ..." % directory)
+            
+        # Creating export file if one doesn't exist yet
+        else:
+            with open(directory, 'w') as outfile:
+                for i in cache_data:
+                    outfile.write(i + '\n')
+            logging.info("retrieved data exported to %s..." % directory)
 # ---------------------------------------------
 
-
-# ------------- CSV CACHING -------------------
-def csv_cache(data,directory):
-    
-    # Updating exported file with newly cached data
-    if os.path.exists(directory) == True:
-        with open(directory, 'a') as outfile:
-            writer = csv.writer(outfile)
-            writer.writerows(data)
-        logging.info("%s file updated ..." % directory)
-        
-    # Creating export file if one doesn't exist yet
-    else:
-        with open(directory, 'w') as outfile:
-            writer = csv.writer(outfile)
-            writer.writerows(data)
-        logging.info("retrieved data exported to %s..." % directory)
-# ---------------------------------------------
 
 
 # ------------------ WAITING ------------------
@@ -140,7 +157,7 @@ try:
     logging.info('Loading of external file ...')
 
     # Loading data
-    export = json_load('/home/codeuser/code/data/raw_data/batch%s_twitter_export.json' % batch_nr)
+    export = json_load(import_dir)
 
     logging.info('File successfully loaded ...')
     logging.info('Processing of useres initiated ...')
@@ -250,8 +267,8 @@ try:
                 processed += 1
                 if processed % 100 == 0:
                     # Saving new gained info every 100 users
-                    cache(export_geoloc, export_directory)
-                    csv_cache(not_found, export_directory_2)
+                    cache(export_geoloc, export_dir, json)
+                    cache(not_found, export_dir_missing, csv)
                     not_found = [] 
                     export_geoloc = {}
 
@@ -262,8 +279,8 @@ try:
                 logging.info("Last processed user: " + str(processed))        
         
             
-    cache(export_geoloc, export_directory)
-    csv_cache(not_found, export_directory_2)
+    cache(export_geoloc, export_dir, json)
+    cache(not_found, export_dir_missing, csv)
     not_found = [] 
     export_geoloc = {}
 
