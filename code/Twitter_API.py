@@ -10,6 +10,31 @@ import csv
 
 
 
+############## INPUT VARIABLES ################
+# Optional input for partial processing
+start_at = 0
+
+# Directory Input
+api_tokens = 'code/tokens/github_tokens.csv'
+
+# Optional working with batches
+batch = TRUE    # If TRUE, batch number has to be specified according to file names
+batch_nr = 1
+
+if batch:
+    log_dir = 'LOGS/batch%s_LOG_Twitter_API.log' % batch_nr
+    import_data = 'data/raw_data/batch%s_github_export.json' % batch_nr
+    export_dir = 'data/raw_data/batch%s_twitter_export.json' % batch_nr
+    export_missing_dir = 'data/raw_data/batch%s_twitter_api_not_found.csv' % batch_nr
+else:
+    log_dir = 'LOGS/LOG_Twitter_API.log'
+    import_data = 'data/raw_data/github_export.json'
+    export_dir = 'data/raw_data/twitter_export.json'
+    export_missing_dir = 'data/raw_data/twitter_api_not_found.csv'
+###############################################
+
+
+
 # ------------- GLOBAL VARIABLES --------------
 batch_nr = 0
 count = 0
@@ -26,12 +51,9 @@ er_403 = 0
 er_400 = 0
 er_twitter = 0
 
-logging.basicConfig(filename='/home/codeuser/code/LOGS/batch%s_LOG_Twitter_API.log'  % batch_nr, filemode='a', 
+logging.basicConfig(log_dir, filemode='a', 
                     format='%(asctime)s [%(levelname)s] - %(message)s', 
                     datefmt='%d-%m-%y %H:%M:%S', level=logging.INFO)
-
-export_dictionary = '/home/codeuser/code/data/raw_data/batch%s_twitter_export.json' % batch_nr
-export_dictionary_2 = '/home/codeuser/code/data/raw_data/batch%s_twitter_api_not_found.csv' % batch_nr
 # ---------------------------------------------
 
 
@@ -56,43 +78,38 @@ api = tweepy.API(auth, wait_on_rate_limit=False, wait_on_rate_limit_notify=False
 
 
 # ----------- CACHING AND EXPORTING -----------
-def cache(export_twitter):
-    logging.info('... ' + str(processed) + '/' + str(len(export)) + ' users processed ...')
-    
-    # Updating exported file with newly cached data
-    if os.path.exists(export_dictionary) == True:
-        with open(export_dictionary, 'r+') as outfile:
-            cache = json.load(outfile)
-            cache.update(export_twitter) # append new data to existing file
-            outfile.seek(0) 
-            json.dump(cache, outfile)
-        logging.info("export file updated ...")
-        
-    # Creating export file if one doesn't exist yet
-    else:
-        with open(export_dictionary, 'w') as outfile:
-            json.dump(export_twitter, outfile)
-        logging.info("retrieved data exported ...")
-# ---------------------------------------------
+def cache(cache_data, directory, type):
 
+    if type == 'json':
+        # Updating exported file with newly cached data
+        if os.path.exists(directory) == True:
+            with open(directory, 'r+') as outfile:
+                cache = json.load(outfile)
+                cache.update(cache_data) # append new data to existing file
+                outfile.seek(0) 
+                json.dump(cache, outfile)
+            logging.info("%s file updated ..." % directory)
+            
+        # Creating export file if one doesn't exist yet
+        else:
+            with open(directory, 'w') as outfile:
+                json.dump(cache_data, outfile)
+            logging.info("retrieved data exported to %s..." % directory)
 
-
-# ------------- CSV CACHING -------------------
-def csv_cache(data,directory):
-    
-    # Updating exported file with newly cached data
-    if os.path.exists(directory) == True:
-        with open(directory, 'a') as outfile:
-            writer = csv.writer(outfile)
-            writer.writerows(data)
-        logging.info("%s file updated ..." % directory)
-        
-    # Creating export file if one doesn't exist yet
-    else:
-        with open(directory, 'w') as outfile:
-            writer = csv.writer(outfile)
-            writer.writerows(data)
-        logging.info("retrieved data exported to %s..." % directory)
+    if type == 'csv':
+        # Updating exported file with newly cached data
+        if os.path.exists(directory) == True:
+            with open(directory, 'a') as outfile:
+                for i in cache_data:
+                    outfile.write(i + '\n')
+            logging.info("%s file updated ..." % directory)
+            
+        # Creating export file if one doesn't exist yet
+        else:
+            with open(directory, 'w') as outfile:
+                for i in cache_data:
+                    outfile.write(i + '\n')
+            logging.info("retrieved data exported to %s..." % directory)
 # ---------------------------------------------
 
 
@@ -143,14 +160,11 @@ try:
 
 
     logging.info('Loading of external file ...')
-
-    export = json_load('/home/codeuser/code/data/raw_data/batch%s_github_export.json' % batch_nr)
-
     logging.info('File successfully loaded ...')
     logging.info('Processing of useres initiated ...')
     log_starttime = datetime.datetime.now()
 
-    for user in export:
+    for user in import_data:
         
 
         count += 1
@@ -160,7 +174,7 @@ try:
             try:
 
 
-                twitter_username = export[user]["twitter_username"]
+                twitter_username = import_data[user]["twitter_username"]
                 if twitter_username:
                     
                     repeat = True
@@ -223,7 +237,7 @@ try:
                     twitter_data = None
 
 
-                export_twitter[str(user)] = export[user]
+                export_twitter[str(user)] = import_data[user]
                 export_twitter[user]["twitter_username"] = twitter_data
 
 
@@ -231,8 +245,8 @@ try:
                 processed += 1
                 if processed % 100 == 0:
                     # Saving new gained info every 100 users
-                    cache(export_twitter)
-                    csv_cache(not_found, export_dictionary_2)
+                    cache(export_twitter, export_dir, json)
+                    cache(not_found, export_missing_dir, csv)
                     not_found = [] 
                     export_twitter = {}
                 
@@ -245,12 +259,12 @@ try:
 
 
     # Exporting remaining user data
-    cache(export_twitter)
-    csv_cache(not_found, export_dictionary_2)
+    cache(export_twitter, export_dir, csv)
+    cache(not_found, export_missing_dir, json)
     not_found = [] 
     export_twitter = {}
 
-    logging.info(str(completed) + " of " + str(len(export)) + " users succesfully processed")
+    logging.info(str(completed) + " of " + str(len(import_data)) + " users succesfully processed")
     logging.info(str(er_twitter) + " users could not be found")
     log_endtime = datetime.datetime.now()
     log_runtime = (log_endtime - log_starttime)
