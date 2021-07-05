@@ -12,32 +12,40 @@ import graphQL_API
 
 
 
-# ----------- AUTHENTIFIKATION INFO -----------
-# Reading externaly saved API tokens
-with open('/home/codeuser/code/tokens/github_tokens.csv', 'r', encoding='utf-8-sig') as tokens:
-    reader = csv.reader(tokens, delimiter = ',')
-    # Stack with tokens that have not reached limit
-    token_ready = list(reader)
+############## INPUT VARIABLES ################
+# Optional input for partial processing
+start_at = 0
 
+# Directory Input
+api_tokens = 'code/tokens/github_tokens.csv'
 
-# Stack with limited tokens 
-token_wait = []
+# Optional working with batches
+batch = TRUE    # If TRUE, batch number has to be specified according to file names
+batch_nr = 1
 
-auth = tuple(token_ready.pop(0))
-# ---------------------------------------------
+if batch:
+    log_dir = 'LOG/batch%s_LOG_Github_API.log' % batch_nr
+    import_data = 'data/processed_data/batch%s_usernames.csv' % batch_nr
+    export = 'data/raw_data/batch%s_github_export.json' % batch_nr
+    export_missing = 'data/raw_data/batch%s_github_api_not_found.csv' % batch_nr
+else:
+    log_dir = 'LOG/LOG_Github_API.log'
+    import_data = 'data/processed_data/usernames.csv'
+    export = 'data/raw_data/github_export.json'
+    export_missing = 'data/raw_data/github_api_not_found.csv'
+###############################################
 
 
 
 # ------------- GLOBAL VARIABLES --------------
-batch_nr = 0
+url = 'https://api.github.com/users/'
+
+# Progress counting
 count = 0
-start_at = 0
-
-url = "https://api.github.com/users/"
-
 processed = 0
 completed = 0
 
+# Error Capturing
 er_500 = 0
 er_422 = 0
 er_404 = 0
@@ -51,9 +59,24 @@ users_not_found = []
 data_extracted = {}
 sponsor_list = []
 
-logging.basicConfig(filename='/home/codeuser/code/LOGS/batch%s_LOG_Github_API.log' % batch_nr, filemode='a', 
+logging.basicConfig(filename=log_dir, filemode='a', 
                     format='%(asctime)s [%(levelname)s] - %(message)s', 
                     datefmt='%d-%m-%y %H:%M:%S', level=logging.INFO)
+# ---------------------------------------------
+
+
+
+# ----------- AUTHENTIFIKATION INFO -----------
+# Reading externaly saved API tokens
+with open(api_tokens, 'r', encoding='utf-8-sig') as tokens:
+    reader = csv.reader(tokens, delimiter = ',')
+    # Stack with tokens that have not reached limit
+    token_ready = list(reader)
+
+# Stack with limited tokens 
+token_wait = []
+
+auth = tuple(token_ready.pop(0))
 # ---------------------------------------------
 
 
@@ -128,7 +151,7 @@ def switch(auth, object1, url):
 
 # ------------ LOADING USER NAMES -------------
 # Reading usernames into a list
-with open('/home/codeuser/code/data/processed_data/batch%s_usernames.csv' % batch_nr, 'r', encoding='utf-8-sig') as csv_file:
+with open(import_data, 'r', encoding='utf-8-sig') as csv_file:
     logging.info('Loading of external file ...')
     reader = csv.reader(csv_file, delimiter = ',')
     usernames = list(reader)
@@ -253,8 +276,8 @@ try:
                     #print(data_extracted)
                     logging.info('... ' + str(processed+start_at) + '/' + str(len(usernames)) + ' users processed ...' '(' + str(count) + ')')
                     # Saving new gained info every 100 users
-                    cache(data_extracted, '/home/codeuser/code/data/raw_data/batch%s_github_export.json' % batch_nr, 'json')
-                    cache(users_not_found, '/home/codeuser/code/data/raw_data/batch%s_github_api_not_found.csv' % batch_nr, 'csv')
+                    cache(data_extracted, export, 'json')
+                    cache(users_not_found, export_missing, 'csv')
                     data_extracted = {}
                     users_not_found = []
 
