@@ -6,6 +6,9 @@ import time
 import logging
 import datetime
 import csv
+import sys
+sys.path.append('Resources')
+import caching
 # ---------------------------------------------
 
 
@@ -72,43 +75,6 @@ auth_token = token_ready.pop(0)
 auth = tweepy.OAuthHandler(auth_token[0],auth_token[1])
 auth.set_access_token(auth_token[2],auth_token[3])
 api = tweepy.API(auth, wait_on_rate_limit=False, wait_on_rate_limit_notify=False)
-# ---------------------------------------------
-
-
-
-# ----------- CACHING AND EXPORTING -----------
-def cache(cache_data, directory, type):
-
-    if type == 'json':
-        # Updating exported file with newly cached data
-        if os.path.exists(directory) == True:
-            with open(directory, 'r+') as outfile:
-                cache = json.load(outfile)
-                cache.update(cache_data) # append new data to existing file
-                outfile.seek(0) 
-                json.dump(cache, outfile)
-            logging.info("%s file updated ..." % directory)
-            
-        # Creating export file if one doesn't exist yet
-        else:
-            with open(directory, 'w') as outfile:
-                json.dump(cache_data, outfile)
-            logging.info("retrieved data exported to %s..." % directory)
-
-    if type == 'csv':
-        # Updating exported file with newly cached data
-        if os.path.exists(directory) == True:
-            with open(directory, 'a') as outfile:
-                for i in cache_data:
-                    outfile.write(i + '\n')
-            logging.info("%s file updated ..." % directory)
-            
-        # Creating export file if one doesn't exist yet
-        else:
-            with open(directory, 'w') as outfile:
-                for i in cache_data:
-                    outfile.write(i + '\n')
-            logging.info("retrieved data exported to %s..." % directory)
 # ---------------------------------------------
 
 
@@ -246,8 +212,8 @@ try:
                 processed += 1
                 if processed % 100 == 0:
                     # Saving new gained info every 100 users
-                    cache(export_twitter, export_dir, json)
-                    cache(not_found, export_missing_dir, csv)
+                    caching.cache(export_twitter, export_dir, json)
+                    caching.cache(not_found, export_missing_dir, csv)
                     not_found = [] 
                     export_twitter = {}
                 
@@ -260,8 +226,8 @@ try:
 
 
     # Exporting remaining user data
-    cache(export_twitter, export_dir, csv)
-    cache(not_found, export_missing_dir, json)
+    caching.cache(export_twitter, export_dir, csv)
+    caching.cache(not_found, export_missing_dir, json)
     not_found = [] 
     export_twitter = {}
 
