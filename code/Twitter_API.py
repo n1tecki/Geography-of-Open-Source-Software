@@ -36,7 +36,6 @@ else:
 
 
 # ------------- GLOBAL VARIABLES --------------
-batch_nr = 0
 count = 0
 start_at = 0
 
