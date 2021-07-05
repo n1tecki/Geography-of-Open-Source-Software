@@ -23,12 +23,12 @@ batch_nr = 1
 
 if batch:
     log_dir = 'LOGS/batch%s_LOG_Twitter_API.log' % batch_nr
-    import_data = 'data/raw_data/batch%s_github_export.json' % batch_nr
+    import_dir = 'data/raw_data/batch%s_github_export.json' % batch_nr
     export_dir = 'data/raw_data/batch%s_twitter_export.json' % batch_nr
     export_missing_dir = 'data/raw_data/batch%s_twitter_api_not_found.csv' % batch_nr
 else:
     log_dir = 'LOGS/LOG_Twitter_API.log'
-    import_data = 'data/raw_data/github_export.json'
+    import_dir = 'data/raw_data/github_export.json'
     export_dir = 'data/raw_data/twitter_export.json'
     export_missing_dir = 'data/raw_data/twitter_api_not_found.csv'
 ###############################################
@@ -164,6 +164,8 @@ try:
     logging.info('Processing of useres initiated ...')
     log_starttime = datetime.datetime.now()
 
+    
+    import_data = json_load(import_dir)
     for user in import_data:
         
 
