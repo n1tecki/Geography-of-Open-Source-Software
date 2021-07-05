@@ -8,14 +8,35 @@ from nuts_finder import NutsFinder
 
 
 
-# ------------- GLOBAL VARIABLES --------------
-batch_nr = 0
-count = 0
+############## INPUT VARIABLES ################
+# Version of NUTS
+year = 2016
+
+# Optional input for partial processing
 start_at = 0
+
+# Optional working with batches
+batch = TRUE    # If TRUE, batch number has to be specified according to file names
+batch_nr = 1
+
+if batch:
+    log_dir = 'LOGS/batch%s_LOG_Nuts_Geocode.log' % batch_nr
+    import_dir = 'data/raw_data/batch%s_twitter_geoloc_export.json' % batch_nr
+    export_dir = 'data/raw_data/batch%s_nuts_geoloc_export.json' % batch_nr
+else:
+    log_dir = 'LOGS/LOG_Nuts_Geocode.log'
+    import_dir = 'data/raw_data/twitter_geoloc_export.json'
+    export_dir = 'data/raw_data/nuts_geoloc_export.json'
+###############################################
+
+
+
+# ------------- GLOBAL VARIABLES --------------
+count = 0
 
 export_geoloc = {}
 
-logging.basicConfig(filename='/home/codeuser/code/LOGS/batch%s_LOG_Nuts_Geocode.log' % batch_nr, filemode='a', 
+logging.basicConfig(filename=log_dir, filemode='a', 
                     format='%(asctime)s [%(levelname)s] - %(message)s', 
                     datefmt='%d-%m-%y %H:%M:%S', level=logging.INFO)
 # ---------------------------------------------
@@ -23,28 +44,43 @@ logging.basicConfig(filename='/home/codeuser/code/LOGS/batch%s_LOG_Nuts_Geocode.
 
 
 # ----------- CACHING AND EXPORTING -----------
-def cache(export_geoloc, directory):
-    logging.info('... ' + str(count) + '/' + str(len(data)) + ' users processed ...')
-    
-    # Updating exported file with newly cached data
-    if os.path.exists(directory) == True:
-        with open(directory, 'r+') as outfile:
-            cache = json.load(outfile)
-            cache.update(export_geoloc) # append new data to existing file
-            outfile.seek(0) 
-            json.dump(cache, outfile)
-        logging.info("%s file updated ..." % directory)
-        
-    # Creating export file if one doesn't exist yet
-    else:
-        with open(directory, 'w') as outfile:
-            json.dump(export_geoloc, outfile)
-        logging.info("retrieved data exported to %s..." % directory)
+def cache(cache_data, directory, type):
+
+    if type == 'json':
+        # Updating exported file with newly cached data
+        if os.path.exists(directory) == True:
+            with open(directory, 'r+') as outfile:
+                cache = json.load(outfile)
+                cache.update(cache_data) # append new data to existing file
+                outfile.seek(0) 
+                json.dump(cache, outfile)
+            logging.info("%s file updated ..." % directory)
+            
+        # Creating export file if one doesn't exist yet
+        else:
+            with open(directory, 'w') as outfile:
+                json.dump(cache_data, outfile)
+            logging.info("retrieved data exported to %s..." % directory)
+
+    if type == 'csv':
+        # Updating exported file with newly cached data
+        if os.path.exists(directory) == True:
+            with open(directory, 'a') as outfile:
+                for i in cache_data:
+                    outfile.write(i + '\n')
+            logging.info("%s file updated ..." % directory)
+            
+        # Creating export file if one doesn't exist yet
+        else:
+            with open(directory, 'w') as outfile:
+                for i in cache_data:
+                    outfile.write(i + '\n')
+            logging.info("retrieved data exported to %s..." % directory)
 # ---------------------------------------------
 
 
 
-with open('/home/codeuser/code/data/raw_data/batch%s_twitter_geoloc_export.json' % batch_nr, "r") as f:
+with open(import_dir, "r") as f:
     data = json.load(f)
 logging.info('Processing of useres initiated ...')
 log_starttime = datetime.datetime.now()
@@ -54,7 +90,7 @@ log_starttime = datetime.datetime.now()
 try:
 
 
-    nf = NutsFinder(year = 2016)
+    nf = NutsFinder(year = year)
     for i in data:
 
         count += 1
@@ -100,12 +136,12 @@ try:
 
             if count % 100 == 0:
                 # Saving new gained info every 100 users
-                cache(export_geoloc, '/home/codeuser/code/data/raw_data/batch%s_nuts_geoloc_export.json' % batch_nr)
+                cache(export_geoloc, export_dir, csv)
                 export_geoloc = {}
 
 
 
-    cache(export_geoloc, '/home/codeuser/code/data/raw_data/batch%s_nuts_geoloc_export.json' % batch_nr)
+    cache(export_geoloc, export_dir, csv)
     export_geoloc = {}
 
 
