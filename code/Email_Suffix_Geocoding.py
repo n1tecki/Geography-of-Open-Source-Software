@@ -4,19 +4,30 @@ import os
 
 
 
-batch_nr = 4
-NAN = 0
-directory = '/home/codeuser/code/data/processed_data/batch%s_final.json' % batch_nr
+############## INPUT VARIABLES ################
+# Optional working with batches
+batch = TRUE    # If TRUE, batch number has to be specified according to file names
+batch_nr = 1
+
+if batch:
+    log_dir = 
+    import_dir = 'data/raw_data/batch%s_nuts_geoloc_export.json' % batch_nr
+    export_dir = 'data/processed_data/batch%s_final.json' % batch_nr
+else:
+    log_dir = 
+    import_dir = 'data/raw_data/nuts_geoloc_export.json'
+    export_dir = 'data/processed_data/final.json'
+###############################################
 
 
 
-with open('/home/codeuser/code/data/raw_data/batch%s_geloc_emailmatch_export.json' % batch_nr, "r") as f:
+with open(import_dir, "r") as f:
     data = json.load(f)
 
-with open('/home/codeuser/code/data/external_data/uni_email_suffix.json', "r") as f:
+with open('data/external_data/uni_email_suffix.json', "r") as f:
     uni_suffix = json.load(f)
 
-with open('/home/codeuser/code/data/external_data/country_domains.csv', 'r', encoding='utf-8-sig') as csv_file:
+with open('data/external_data/country_domains.csv', 'r', encoding='utf-8-sig') as csv_file:
     reader = csv.reader(csv_file, delimiter = ',')
     country_suffix = {rows[1]:rows[0] for rows in reader}
 
@@ -76,12 +87,12 @@ for i in data:
 
 
 # Exporting file
-if os.path.exists(directory) == True:
-    with open(directory, 'r+') as outfile:
+if os.path.exists(export_dir) == True:
+    with open(export_dir, 'r+') as outfile:
         cache = json.load(outfile)
         cache.update(data) # append new data to existing file
 
 # Creating export file if one doesn't exist yet
 else:
-    with open(directory, 'w') as outfile:
+    with open(export_dir, 'w') as outfile:
         json.dump(data, outfile)
