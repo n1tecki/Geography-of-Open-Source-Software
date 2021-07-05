@@ -7,6 +7,7 @@ import time
 import datetime
 import os.path
 import sys
+sys.path.append('Resources')
 import graphQL_API
 # ---------------------------------------------
 
