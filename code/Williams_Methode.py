@@ -12,6 +12,31 @@ import sys
 
 
 
+############## INPUT VARIABLES ################
+# Optional input for partial processing
+start_at = 0
+
+# Directory Input
+api_tokens = 
+
+# Optional working with batches
+batch = TRUE    # If TRUE, batch number has to be specified according to file names
+batch_nr = 1
+
+if batch:
+    log_dir = 'LOGS/batch%s_LOG_Williams_Methode.log' % batch_nr
+    import_dir = 'data/raw_data/batch%s_hashed_emails_.json' % batch_nr
+    export_dir = 'data/raw_data/batch%s_redundant_usernames.csv' % batch_nr
+    export_dir_missing = 'data/raw_data/batch%s_williams_methode_not_found.csv' % batch_nr
+else:
+    log_dir = 'LOGS/LOG_Williams_Methode.log'
+    import_dir = 'data/raw_data/hashed_emails.json'
+    export_dir = 'data/raw_data/redundant_usernames.csv'
+    export_dir_missing = 'data/raw_data/williams_methode_not_found.csv'
+###############################################
+
+
+
 # ----------- AUTHENTIFIKATION INFO -----------
 # Reading externaly saved API tokens
 with open('/home/codeuser/code/tokens/github_tokens.csv', 'r', encoding='utf-8-sig') as tokens:
@@ -29,9 +54,7 @@ g = github.Github(auth)
 
 
 # ------------- GLOBAL VARIABLES --------------
-batch_nr = 1
 count = 0
-start_at = 0
 
 processed = 0
 completed = 0
@@ -42,20 +65,16 @@ er_404_user = 0
 er_other_user = 0
 fatal_er = 0
 
-
 user_names = []
 users_not_found = []
 
 api_calls = 0
-
-export_directory = '/home/codeuser/code/data/raw_data/batch%s_redundant_usernames.csv' % batch_nr
-export_directory_2 = '/home/codeuser/code/data/raw_data/batch%s_williams_methode_not_found.csv' % batch_nr
 # ---------------------------------------------
 
 
 
 # ---------------- LOGGING --------------------
-logging.basicConfig(filename='/home/codeuser/code/LOGS/batch%s_LOG_Williams_Methode.log' % batch_nr, filemode='a', 
+logging.basicConfig(filename=log_dir, filemode='a', 
                     format='%(asctime)s [%(levelname)s] - %(message)s', 
                     datefmt='%d-%m-%y %H:%M:%S', level=logging.INFO)
 # ---------------------------------------------
@@ -135,7 +154,7 @@ def json_load(file):
 try:
 
 
-    data = json_load('/home/codeuser/code/data/raw_data/batches/batch%s.json' % batch_nr)
+    data = json_load(import_dir)
     logging.info('Processing of useres initiated ...')
     log_starttime = datetime.datetime.now()
 
@@ -216,8 +235,8 @@ try:
                 logging.info('... ' + str(processed) + '/' + str(len(data)-start_at) + ' users processed ...' + '(' + str(count) + ')')
                 logging.info(str(er_404_repo) + ', ' + str(er_other_repo) + ', ' + str(er_404_user) + ', ' 
                             + str(er_other_user) + ', ' + str(len(users_not_found)))   # Further information
-                cache(user_names, export_directory)
-                cache(users_not_found, export_directory_2)
+                cache(user_names, export_dir)
+                cache(users_not_found, export_dir_missing)
                 user_names = []
                 users_not_found = []
 
@@ -228,8 +247,8 @@ try:
     logging.info(str(er_404_repo) + ', ' + str(er_other_repo) + ', ' + str(er_404_user) + ', ' 
                 + str(er_other_user) + ', ' + str(len(users_not_found)))   # Further information
     # Exporting remaining user data
-    cache(user_names, export_directory)
-    cache(users_not_found, export_directory_2)
+    cache(user_names, export_dir)
+    cache(users_not_found, export_dir_missing)
     user_names = []
     users_not_found = []
             
