@@ -4,7 +4,7 @@ import csv
 
 
 # Loading all collected infos 
-df = pd.read_csv('/home/codeuser/Data_Analysis/github_accounts.csv', delimiter = ',')
+df = pd.read_csv('github_accounts.csv', delimiter = ',')
 df = df.drop(labels = 'Unnamed: 0', axis = 1)
 
 
@@ -52,7 +52,7 @@ export['total'] = export['github_count'] + export['twitter_count'] + export['mai
 
 # Exporting stats
 export = export.sort_values(by=['total'], ascending=False)
-export.to_csv('/home/codeuser/Data_Analysis/world_stats.csv', sep=',')
+export.to_csv('world_stats.csv', sep=',')
 
 
 
