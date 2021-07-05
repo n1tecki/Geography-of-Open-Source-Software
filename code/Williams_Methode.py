@@ -27,12 +27,12 @@ batch_nr = 1
 
 if batch:
     log_dir = 'LOGS/batch%s_LOG_Williams_Methode.log' % batch_nr
-    import_dir = 'data/raw_data/batch%s_hashed_emails_.json' % batch_nr
+    import_dir = 'data/raw_data/batch%s_commit_data.json' % batch_nr
     export_dir = 'data/raw_data/batch%s_redundant_usernames.csv' % batch_nr
     export_dir_missing = 'data/raw_data/batch%s_williams_methode_not_found.csv' % batch_nr
 else:
     log_dir = 'LOGS/LOG_Williams_Methode.log'
-    import_dir = 'data/raw_data/hashed_emails.json'
+    import_dir = 'data/raw_data/commit_data.json'
     export_dir = 'data/raw_data/redundant_usernames.csv'
     export_dir_missing = 'data/raw_data/williams_methode_not_found.csv'
 ###############################################
