@@ -9,7 +9,7 @@ nuts_lvl = 2
 
 
 # Loading all collected infos 
-df = pd.read_csv('/home/codeuser/Data_Analysis/github_accounts.csv', delimiter = ',')
+df = pd.read_csv('github_accounts.csv', delimiter = ',')
 df = df.drop(labels = 'Unnamed: 0', axis = 1)
 
 
@@ -56,4 +56,4 @@ export['total'] = export['github_count'] + export['twitter_count']
 
 # Exporting stats
 export = export.sort_values(by=['total'], ascending=False)
-export.to_csv('/home/codeuser/Data_Analysis/nuts%s_stats.csv' % nuts_lvl, sep=',')
+export.to_csv('nuts%s_stats.csv' % nuts_lvl, sep=',')
