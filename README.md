@@ -5,9 +5,9 @@ The goal of the project was to measure open source software contribution activit
 
 ### Python scripts
 
-The data collection scripts are written in Python.
-The APIs of the services Github, Twitter, and Bing Maps are used.
-The codes were implemented in Python 3 and tested on a Linux machine. The required dependencies for the scripts are: tweepy, urllib, github, nuts_finder and pandas.
+The data collection scripts are written in Python. <br />
+The APIs of the services Github, Twitter, and Bing Maps are used. <br />
+The codes were implemented in Python 3 and tested on a Linux machine. The required dependencies for the scripts are: tweepy, urllib, github, nuts_finder and pandas. <br />
 
 The codes can be used to collect all user-provided information from Github and Twitter, including usernames, location information, emails, Twitter usernames, other associated accounts/websites, workplaces, bios, sponsor information, etc. Users can also be gelocated based on their location information from said services or by analysis of their email suffixes against a list of country and university domains. Depending on the available data, the user can be located on a national or subnational level.
 
