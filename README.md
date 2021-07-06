@@ -1,6 +1,10 @@
 # Geography of Open Source Software
 
-The goal of the project was to measure open source software contribution activity at a national, regional, and local level using data from GitHub and adjacent platforms. This data is used to better understand how open source interacts with the rest of the economy, for instance as a complement or substitute for proprietary work.
+The goal of this project was to measure open source software contribution activity at a national, regional, and local level using data from GitHub and adjacent platforms. This data is used to better understand how open source interacts with the rest of the economy, for instance as a complement or substitute for proprietary work.
+
+For output data see: https://github.com/johanneswachs/OSS_Geography_Data.
+
+We thank the City of Vienna for funding support.
 
 
 ### Python scripts
