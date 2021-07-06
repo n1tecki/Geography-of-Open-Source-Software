@@ -14,7 +14,7 @@ The code was implemented in Python 3 and tested on a Linux machine. The required
 
 ## Data Collection
 
-### Username Fetching
+1. Username Fetching
 Depending on if the github usernames of contributors are already avalable and known, this step can be skipped:
 The data collection works as a data flow passing musltiple scripts, with each script enriching the available data. 
 In the first step, the usernames of Github contributors are extrected from commit information. The **_Williams_Methode.py_** script takes a CSV file containing commit SHAs of relevant users and calls it via the Github API. Having called the commit itself, the author of that commit is traced and exported into a CSV file. 
