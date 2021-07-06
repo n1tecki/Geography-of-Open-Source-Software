@@ -16,7 +16,7 @@ The code was implemented in Python 3 and tested on a Linux machine. The required
 
 Depending on if the github usernames of contributors are already avalable and known, this step can be skipped:
 The data collection works as a data flow passing musltiple scripts, with each script enriching the available data. 
-In the first step, the usernames of Github contributors are extrected from commit information. The <span style="font-size:larger;">**Williams_Methode.py**</span> script takes a CSV file containing commit SHAs of relevant users and calls it via the Github API. Having called the commit itself, the author of that commit is traced and exported into a CSV file. To check for redundancies in the usernames, the **Redundance_Processing.py** code makes sure each username is unique.
+In the first step, the usernames of Github contributors are extrected from commit information. The <span style="font-size:20;">**Williams_Methode.py**</span> script takes a CSV file containing commit SHAs of relevant users and calls it via the Github API. Having called the commit itself, the author of that commit is traced and exported into a CSV file. To check for redundancies in the usernames, the **Redundance_Processing.py** code makes sure each username is unique.
 
 
  
