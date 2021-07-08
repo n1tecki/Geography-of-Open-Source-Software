@@ -4,6 +4,10 @@ The goal of this project was to measure open source software contribution activi
 
 For output data see: https://github.com/johanneswachs/OSS_Geography_Data.
 
+For an analysis of this data, see:
+> J. Wachs, M. Nitecki, W. Schueller, A. Polleres. "The Geography of Open Source Software: Evidence from GitHub." Arxiv preprint: 2107.03200. (2021)
+(https://arxiv.org/abs/2107.03200)
+
 We thank the City of Vienna for funding support.
 
 
