@@ -8,7 +8,7 @@ import os.path
 import json
 import csv
 import sys
-sys.path.append('Resources')
+sys.path.insert(1, 'Resources')
 import caching
 # ---------------------------------------------
 
@@ -22,7 +22,7 @@ start_at = 0
 api_tokens = 'tokens/github_tokens.csv'
 
 # Optional working with batches
-batch = TRUE    # If TRUE, batch number has to be specified according to file names
+batch = True    # If TRUE, batch number has to be specified according to file names
 batch_nr = 1
 
 if batch:
