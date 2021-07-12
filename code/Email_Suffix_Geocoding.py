@@ -6,7 +6,7 @@ import os
 
 ############## INPUT VARIABLES ################
 # Optional working with batches
-batch = TRUE    # If TRUE, batch number has to be specified according to file names
+batch = True    # If TRUE, batch number has to be specified according to file names
 batch_nr = 1
 
 if batch:
