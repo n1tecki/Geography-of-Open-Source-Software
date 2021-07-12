@@ -5,7 +5,7 @@ import json
 import os
 from nuts_finder import NutsFinder
 import sys
-sys.path.append('Resources')
+sys.path.insert(1, 'Resources')
 import caching
 
 
@@ -18,7 +18,7 @@ year = 2016
 start_at = 0
 
 # Optional working with batches
-batch = TRUE    # If TRUE, batch number has to be specified according to file names
+batch = True    # If TRUE, batch number has to be specified according to file names
 batch_nr = 1
 
 if batch:
