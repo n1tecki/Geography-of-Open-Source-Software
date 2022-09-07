@@ -68,7 +68,7 @@ logging.basicConfig(filename=log_dir, filemode='a',
 
 
 
-# ----------- AUTHENTIFIKATION INFO -----------
+# ----------- AUTHENTICATION INFO -----------
 # Reading externaly saved API tokens
 with open(api_tokens, 'r', encoding='utf-8-sig') as tokens:
     reader = csv.reader(tokens, delimiter = ',')
